@@ -73,7 +73,7 @@ This bean has the @Order(50) annotation which means that if you have other inter
 
 ### Example of a client using the interceptor:
 In this example a bean of type RestClient will be created and will have 
-all beans that implement ClientHttpRequestInterceptor added to it. (including WMInterceptor)
+all beans that implement ClientHttpRequestInterceptor added to it. (including restClientWiremockInterceptor)
 
 ```java
 @Configuration
@@ -89,7 +89,7 @@ public class RestClientConfig {
 }
 ```
 
-### Example of a client using only wmInterceptor: interceptor with Spring Boot.
+### Example of a client using only restClientWiremockInterceptor with Spring Boot.
 
 ```java
 import org.springframework.context.annotation.Bean;
@@ -106,7 +106,7 @@ public class RestClientConfig {
     @Bean
     public RestClient restClient(RestClient.Builder builder) {
         return builder
-            .interceptors(wmInterceptor)
+            .interceptors(restClientWiremockInterceptor)
             .build();
     }
 }

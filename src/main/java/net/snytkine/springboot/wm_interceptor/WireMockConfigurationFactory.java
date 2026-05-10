@@ -1,17 +1,17 @@
-/**
+/*
  * Copyright 2025 - 2026 Dmitri Snytkine. All rights reserved.
  *
- * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * <p>http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * <p>Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- *
- * <p>See the License for the specific language governing permissions and limitations under the
- * License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.snytkine.springboot.wm_interceptor;
 
@@ -23,26 +23,44 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+/**
+ * Translates {@link WireMockProperties} into a {@link WireMockConfiguration} bean.
+ *
+ * <p>{@link WireMockConfiguration} is WireMock's own settings object. This factory reads whatever
+ * the developer put in {@code application.yml} (via {@link WireMockProperties}) and applies each
+ * non-null value to the configuration. Only values that were explicitly set by the developer are
+ * applied; the rest use WireMock's built-in defaults.
+ *
+ * <p>The Faker extension ({@code org.wiremock.RandomExtension}) is always registered, so {@code {{
+ * random '...' }}} template helpers are available in every stub mapping without any additional
+ * configuration.
+ */
 @Configuration
 @Slf4j
-/** Factory class responsible for creating and configuring WireMockConfiguration. */
 public class WireMockConfigurationFactory {
 
   private final WireMockProperties wireMockProperties;
 
+  /**
+   * Creates the factory with the properties bound from {@code application.yml}.
+   *
+   * @param wireMockProperties configuration values supplied by the developer
+   */
   public WireMockConfigurationFactory(WireMockProperties wireMockProperties) {
     this.wireMockProperties = wireMockProperties;
   }
 
+  /**
+   * Builds and returns the {@link WireMockConfiguration} bean.
+   *
+   * <p>Each optional property is only applied when the developer explicitly set it; otherwise
+   * WireMock's default is used. The Faker extension and {@code trustAllProxyTargets} are always
+   * enabled regardless of configuration.
+   *
+   * @return a {@link WireMockConfiguration} ready to be passed to {@link WMInterceptor}
+   */
   @Bean
   @Order(50)
-  /**
-   * Creates and configures a WireMockConfiguration bean based on the application's
-   * WireMockProperties. This configuration includes setting up the port, enabling logging, and
-   * configuring other WireMock server settings.
-   *
-   * @return a configured WireMockConfiguration instance
-   */
   public WireMockConfiguration wireMockConfiguration() {
     WireMockConfiguration wireMockConfiguration = new WireMockConfiguration();
 

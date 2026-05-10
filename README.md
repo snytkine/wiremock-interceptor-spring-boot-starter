@@ -68,7 +68,7 @@ The value of this header will be the same you set in the next property.
 the name specified in the previous property with the value.
 
 The interceptor will automatically be registered with the Spring context 
-a Bean with name wmInterceptor implementing ClientHttpRequestInterceptor
+a Bean with name restClientWiremockInterceptor implementing ClientHttpRequestInterceptor
 This bean has the @Order(50) annotation which means that if you have other interceptors in your application you can add the @Order annotation to your own interceptors and then sort them by order in your component. Remember when list of beans is injected it is not automatically ordered by the @Order annotations. You can use @PostConstruct to ensure that by adding a method to sort injected list by Order annotations.
 
 ### Example of a client using the interceptor:
@@ -101,7 +101,7 @@ import org.springframework.web.client.RestClient;
 public class RestClientConfig {
 
     @Autowired
-    private ClientHttpRequestInterceptor wmInterceptor;
+    private ClientHttpRequestInterceptor restClientWiremockInterceptor;
     
     @Bean
     public RestClient restClient(RestClient.Builder builder) {

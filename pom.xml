@@ -33,13 +33,14 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>wiremock-rest-client-interceptor-spring-boot-starter</name>
 	<description>Spring Boot Starter for WireMock RestClient Interceptor</description>
+	<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
 	<inceptionYear>2025</inceptionYear>
 	<developers>
 		<developer>
+			<id>snytkine</id>
 			<name>Dmitri Snytkine</name>
 			<email>d.snytkine@gmail.com</email>
-			<organization>Snytkine</organization>
-			<organizationUrl>https://snytkine.github.io</organizationUrl>
+			<url>https://github.com/snytkine</url>
 		</developer>
 	</developers>
 	<licenses>
@@ -50,14 +51,10 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
-		<connection>scm:git:git://github.com/mstahv/sliders.git</connection>
-		<!--
-            developerConnection is used by e.g. maven-release-plugin to push changes to the repo.
-            Some "newbies" might be better off with https, I always go with ssh 😎
-        -->
-		<developerConnection>scm:git:ssh://git@github.com:/mstahv/sliders.git</developerConnection>
+		<connection>scm:git:https://github.com/snytkine/rest-client-wiremock-middleware.git</connection>
+		<developerConnection>scm:git:https://github.com/snytkine/rest-client-wiremock-middleware.git</developerConnection>
 		<tag>HEAD</tag>
+		<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
@@ -69,10 +66,9 @@
 		<wiremock.version>3.6.0</wiremock.version>
 		<wiremock.max-version>3.10.0</wiremock.max-version>
 		<!-- JaCoCo configuration -->
-		<jacoco.version>0.8.11</jacoco.version>
-		<!-- Minimum instruction coverage (ratio between 0.0 and 1.0) -->
-		<jacoco.minimumCoverage>0.80</jacoco.minimumCoverage>
-		<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+		<jacoco.version>0.8.12</jacoco.version>
+		<jacoco.minimum.instruction.coverage>0.80</jacoco.minimum.instruction.coverage>
+		<jacoco.minimum.branch.coverage>0.70</jacoco.minimum.branch.coverage>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -130,51 +126,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.6.1</version>
-				<executions>
-					<execution>
-						<id>timestamp-property</id>
-						<goals>
-							<goal>timestamp-property</goal>
-						</goals>
-						<phase>validate</phase>
-						<configuration>
-							<name>current.year</name>
-							<pattern>yyyy</pattern>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>com.mycila</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<header>${project.basedir}/src/main/resources/license-header.txt</header>
-					<includes>
-						<include>**/*.java</include>
-						<include>**/*.xml</include>
-						<include>**/*.properties</include>
-					</includes>
-					<properties>
-						<currentYear>2026</currentYear>
-					</properties>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-
 			<!-- Spotless code formatting plugin (enforces formatting compatible with Spring
 			guidelines) -->
 			<plugin>
@@ -183,6 +134,9 @@
 				<version>3.1.0</version>
 				<configuration>
 					<java>
+						<licenseHeader>
+							<file>${project.basedir}/src/main/resources/license-header.txt</file>
+						</licenseHeader>
 						<googleJavaFormat>
 							<version>1.17.0</version>
 						</googleJavaFormat>
@@ -266,7 +220,12 @@
 										<limit>
 											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>${jacoco.minimumCoverage}</minimum>
+											<minimum>${jacoco.minimum.instruction.coverage}</minimum>
+										</limit>
+										<limit>
+											<counter>BRANCH</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>${jacoco.minimum.branch.coverage}</minimum>
 										</limit>
 									</limits>
 								</rule>
@@ -323,11 +282,12 @@
 			<plugin>
 				<groupId>org.sonatype.central</groupId>
 				<artifactId>central-publishing-maven-plugin</artifactId>
-				<version>0.6.0</version>
+				<version>0.7.0</version>
 				<extensions>true</extensions>
 				<configuration>
 					<publishingServerId>central</publishingServerId>
 					<autoPublish>true</autoPublish>
+					<waitUntil>published</waitUntil>
 				</configuration>
 			</plugin>
 
@@ -348,7 +308,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.10.1</version>
+				<configuration>
+					<doclint>none</doclint>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -359,10 +321,9 @@
 				</executions>
 			</plugin>
 
-			<!-- <plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>3.2.4</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -372,7 +333,33 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin> -->
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>spotless:apply deploy</goals>
+					<preparationGoals>clean</preparationGoals>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+		</profile>
+	</profiles>
 </project>

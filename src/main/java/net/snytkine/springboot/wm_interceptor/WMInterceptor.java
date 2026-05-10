@@ -1,17 +1,17 @@
-/**
+/*
  * Copyright 2025 - 2026 Dmitri Snytkine. All rights reserved.
  *
- * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * <p>http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * <p>Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied.
- *
- * <p>See the License for the specific language governing permissions and limitations under the
- * License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.snytkine.springboot.wm_interceptor;
 
@@ -52,55 +52,46 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * HTTP request interceptor that integrates WireMock mocking capabilities into Spring's
- * RestTemplate.
+ * Spring {@link org.springframework.http.client.ClientHttpRequestInterceptor} that silently routes
+ * matching outgoing HTTP requests to WireMock stubs instead of the real network.
  *
- * <p>This interceptor intercepts outgoing HTTP requests and attempts to match them against
- * configured WireMock stubs. If a matching stub is found, the mocked response is returned;
- * otherwise, the request is passed through to the actual HTTP server.
- *
- * <p>Key Features:
+ * <p>Every time a {@code RestClient} (or {@code RestTemplate}) makes an HTTP call, this interceptor
+ * runs first. It converts the Spring request into WireMock's internal format, asks WireMock whether
+ * any configured stub matches, and then either:
  *
  * <ul>
- *   <li>Transparent request interception at the Spring ClientHttpRequestInterceptor level
- *   <li>Automatic WireMock stub matching without modifying request execution flow
- *   <li>Optional response header injection to identify mock responses
- *   <li>Seamless conversion between Spring and WireMock request/response formats
+ *   <li>returns the stub's mocked response immediately (no network call made), or
+ *   <li>passes the request through to the real server unchanged if no stub matched.
  * </ul>
  *
- * <p>Usage: The interceptor is instantiated with a {@link WireMockConfiguration} and {@link
- * WireMockProperties}. It automatically initializes a WireMock server with a direct call HTTP
- * server factory, allowing in-process stub matching without network I/O.
+ * <p>WireMock matching is done entirely in-process using {@link DirectCallHttpServer} — there is no
+ * actual HTTP server listening on a port. This makes the interceptor fast and suitable for use in
+ * production as well as in tests.
  *
- * <p>Mock Identification: When a mock response is returned, an optional header can be added to
- * identify the response as originating from the mock middleware. This is controlled by the {@code
- * mockResponseHeader} and {@code mockResponseHeaderValue} properties.
+ * <p>If {@link WireMockProperties#getMockResponseHeader()} is configured, a header is added to
+ * every mocked response so the caller can tell it came from WireMock rather than the real server.
  *
- * @see org.springframework.http.client.ClientHttpRequestInterceptor
- * @see com.github.tomakehurst.wiremock.core.WireMockConfiguration
  * @see WireMockProperties
+ * @see WireMockConfigurationFactory
  */
 @Slf4j
 public class WMInterceptor implements ClientHttpRequestInterceptor {
-  /** The {@link DirectCallHttpServer} instance that is responsible for handling */
+  /** WireMock's in-process request matcher — no network port, no HTTP server thread. */
   private final DirectCallHttpServer directCallHttpServer;
 
-  /** The {@link WireMockProperties} instance that contains configuration. */
+  /** User-supplied configuration controlling mock headers, templating, stub location, etc. */
   private final WireMockProperties properties;
 
   /**
-   * Constructs a new {@code WireMockInterceptor} with the specified WireMock configuration and
-   * properties.
+   * Creates the interceptor and initialises the in-process WireMock stub matcher.
    *
-   * <p>This constructor initializes a {@link DirectCallHttpServer} to enable in-process request
-   * interception and matching against WireMock stubs. It also configures the interceptor with
-   * properties such as mock response headers and other configuration options.
+   * <p>A {@link DirectCallHttpServerFactory} is used so that WireMock loads and indexes the stub
+   * mappings without binding to any network port. After this constructor returns, the interceptor
+   * is ready to match requests immediately.
    *
-   * @param wireMockConfiguration the WireMock configuration used to set up the underlying WireMock
-   *     server
-   * @param properties the configuration properties for the WireMock interceptor, including mock
-   *     response header settings
-   * @throws IllegalArgumentException if either {@code config} or {@code properties} is null
+   * @param wireMockConfiguration WireMock server settings (stub location, templating, etc.),
+   *     typically produced by {@link WireMockConfigurationFactory}
+   * @param properties user configuration such as which header to add to mocked responses
    */
   public WMInterceptor(WireMockConfiguration wireMockConfiguration, WireMockProperties properties) {
     this.properties = properties;
@@ -142,18 +133,23 @@ public class WMInterceptor implements ClientHttpRequestInterceptor {
   }
 
   /**
-   * Adapts a Spring {@link HttpRequest} to a WireMock {@link Request} for compatibility.
+   * Bridges Spring's {@link HttpRequest} to WireMock's {@link Request} interface.
    *
-   * <p>This adapter translates Spring's HTTP request representation into WireMock's internal
-   * request model, enabling seamless integration with WireMock's stub matching logic.
+   * <p>WireMock's stub-matching engine only knows about its own {@link Request} type. This adapter
+   * wraps a Spring {@link HttpRequest} so it can be handed directly to WireMock for matching,
+   * without copying all request data upfront. Method, URI, headers, query parameters, and body are
+   * translated on demand as WireMock's matcher inspects them.
    *
-   * <p>It handles conversion of:
+   * <p>A few Spring-to-WireMock mapping decisions worth noting:
    *
    * <ul>
-   *   <li>HTTP method
-   *   <li>URI and query parameters
-   *   <li>Headers
-   *   <li>Body content
+   *   <li>{@code getPort()} returns {@code 80} for HTTP and {@code 443} for HTTPS when the URI does
+   *       not include an explicit port number (Spring returns {@code -1} in that case).
+   *   <li>{@code getClientIp()} always returns {@code "0.0.0.0"} because Spring's {@link
+   *       HttpRequest} does not expose the local client address.
+   *   <li>Multipart detection is based solely on the {@code Content-Type} header prefix ({@code
+   *       multipart/form-data}); individual parts are not parsed and {@link #getParts()} always
+   *       returns an empty collection.
    * </ul>
    */
   private static class SpringHttpRequestAdapter implements Request {
@@ -171,11 +167,10 @@ public class WMInterceptor implements ClientHttpRequestInterceptor {
     }
 
     /**
-     * Constructs a new SpringHttpRequestAdapter to convert a Spring HttpRequest into a WireMock
-     * Request.
+     * Wraps an outgoing Spring HTTP request so it can be matched against WireMock stubs.
      *
-     * @param springRequest the Spring HttpRequest to be adapted
-     * @param body the body of the request as a byte array
+     * @param springRequest the outgoing request as seen by the interceptor
+     * @param body the raw request body bytes (may be empty for GET/DELETE requests)
      */
     public SpringHttpRequestAdapter(HttpRequest springRequest, byte[] body) {
       this.springRequest = springRequest;
@@ -344,29 +339,18 @@ public class WMInterceptor implements ClientHttpRequestInterceptor {
   }
 
   /**
-   * Adapter implementation of {@link ClientHttpResponse} that wraps a WireMock HTTP response.
+   * Bridges a WireMock stub {@link com.github.tomakehurst.wiremock.http.Response} to Spring's
+   * {@link ClientHttpResponse} interface.
    *
-   * <p>This class converts WireMock's response format to Spring's {@link ClientHttpResponse}
-   * interface, allowing WireMock responses to be used seamlessly within Spring's HTTP client
-   * framework.
+   * <p>When a stub matches, WireMock returns its own {@code Response} object. Spring's HTTP client
+   * stack expects a {@link ClientHttpResponse}. This class wraps the WireMock response so it can be
+   * returned directly to the caller without any Spring code knowing WireMock was involved.
    *
-   * <p>The adapter handles:
-   *
-   * <ul>
-   *   <li>HTTP status codes and status messages
-   *   <li>Response headers conversion from WireMock format to Spring HttpHeaders
-   *   <li>Response body as an InputStream
-   * </ul>
-   *
-   * <p>Headers from the WireMock response are copied into a Spring {@link HttpHeaders} instance
-   * during construction. Additional headers can be set using {@link #setHeader(String, String)}.
-   *
-   * <p>The response body is wrapped in a {@link ByteArrayInputStream} for compatibility with the
-   * {@link ClientHttpResponse} contract. If the WireMock response body is null, an empty byte array
-   * is used instead.
-   *
-   * @see org.springframework.http.client.ClientHttpResponse
-   * @see com.github.tomakehurst.wiremock.http.Response
+   * <p>All headers from the WireMock stub are copied into a mutable Spring {@link
+   * org.springframework.http.HttpHeaders} map during construction. The {@link #setHeader(String,
+   * String)} method allows the interceptor to inject additional headers afterwards (e.g. the
+   * mock-identification header). A {@code null} body in the WireMock response is normalised to an
+   * empty byte array so callers never receive a {@code null} stream.
    */
   private static class WiremockClientHttpResponse implements ClientHttpResponse {
     private final com.github.tomakehurst.wiremock.http.Response wiremockResponse;

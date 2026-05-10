@@ -356,6 +356,49 @@ class WMInterceptorTest {
     com.github.tomakehurst.wiremock.http.HttpHeaders wh = adapter.getHeaders();
     assertNotNull(wh);
     assertTrue(wh.all().isEmpty());
+
+    // getUrl() with no query string — the query-null branch
+    assertEquals("/path", adapter.getUrl());
+
+    // isMultipart() when Content-Type header is absent — the null short-circuit branch
+    assertFalse(adapter.isMultipart());
+
+    // header() when the header does not exist — returns an absent HttpHeader (isPresent() == false)
+    com.github.tomakehurst.wiremock.http.HttpHeader missing = adapter.header("X-MISSING");
+    assertNotNull(missing);
+    assertFalse(missing.isPresent());
+  }
+
+  @Test
+  void defaultHttpsPortWhenNoExplicitPortInUri() throws Exception {
+    HttpRequest req =
+        new HttpRequest() {
+          @Override
+          public HttpMethod getMethod() {
+            return HttpMethod.GET;
+          }
+
+          @Override
+          public URI getURI() {
+            return URI.create("https://example.com/path");
+          }
+
+          @Override
+          public org.springframework.http.HttpHeaders getHeaders() {
+            return new org.springframework.http.HttpHeaders();
+          }
+        };
+
+    Class<?> adapterCls =
+        Class.forName(
+            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+    java.lang.reflect.Constructor<?> ctor =
+        adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
+    ctor.setAccessible(true);
+    com.github.tomakehurst.wiremock.http.Request adapter =
+        (com.github.tomakehurst.wiremock.http.Request) ctor.newInstance(req, new byte[0]);
+
+    assertEquals(443, adapter.getPort());
   }
 
   @Test
@@ -363,6 +406,7 @@ class WMInterceptorTest {
     Response mockResponse = mock(Response.class);
     when(mockResponse.getBody()).thenReturn(null);
     when(mockResponse.getHeaders()).thenReturn(null);
+    when(mockResponse.getStatusMessage()).thenReturn(null);
 
     Class<?> respCls =
         Class.forName(
@@ -379,6 +423,49 @@ class WMInterceptorTest {
     setHeader.invoke(resp, "K", "V");
 
     assertEquals("V", resp.getHeaders().getFirst("K"));
+
+    // getBody() when the underlying body is null — should return an empty stream, not throw
+    byte[] bodyBytes = resp.getBody().readAllBytes();
+    assertArrayEquals(new byte[0], bodyBytes);
+
+    // getStatusText() when statusMessage is null — should return empty string, not throw
+    assertEquals("", resp.getStatusText());
+  }
+
+  @Test
+  void interceptReturnsMockResponseWithoutMockHeaderWhenHeaderNameNotConfigured() throws Exception {
+    // mockResponseHeader is null (not configured) — mock response is still returned but no
+    // extra identification header is added
+    WireMockProperties props = new WireMockProperties();
+    // leave mockResponseHeader as null (default)
+
+    WMInterceptor interceptor =
+        new WMInterceptor(new com.github.tomakehurst.wiremock.core.WireMockConfiguration(), props);
+
+    DirectCallHttpServer mockServer = mock(DirectCallHttpServer.class);
+    Response mockResponse = mock(Response.class);
+    when(mockResponse.wasConfigured()).thenReturn(true);
+    when(mockResponse.getStatus()).thenReturn(200);
+    when(mockResponse.getBody()).thenReturn("body".getBytes(StandardCharsets.UTF_8));
+    when(mockResponse.getStatusMessage()).thenReturn("OK");
+    when(mockResponse.getHeaders()).thenReturn(null);
+    when(mockServer.stubRequest(any())).thenReturn(mockResponse);
+
+    java.lang.reflect.Field f = WMInterceptor.class.getDeclaredField("directCallHttpServer");
+    f.setAccessible(true);
+    f.set(interceptor, mockServer);
+
+    ClientHttpRequestExecution exec =
+        (request, body) -> {
+          fail("Execution should not be called when mock response is configured");
+          return null;
+        };
+
+    ClientHttpResponse resp =
+        interceptor.intercept(simpleRequest("http://localhost/test"), new byte[0], exec);
+    assertEquals(200, resp.getStatusCode().value());
+    // no mock-identification header should be present
+    assertNull(resp.getHeaders().getFirst("X-MOCK"));
   }
 
   @Test

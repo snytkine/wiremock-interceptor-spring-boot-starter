@@ -104,6 +104,119 @@ class WireMockPropertiesTest {
     assertTrue(s.contains("mockResponseHeaderValue=v") || s.contains("mockResponseHeaderValue= v"));
   }
 
+  /** Returns a WireMockProperties with every field set to a non-null/non-default value. */
+  private WireMockProperties fullyPopulated() {
+    WireMockProperties p = new WireMockProperties();
+    p.setEnabled(true);
+    p.setContainerThreads(2);
+    p.setAsynchronousResponseEnabled(true);
+    p.setAsynchronousResponseThreads(4);
+    p.setRootDirectory("/tmp/stubs");
+    p.setJournalDisabled(true);
+    p.setMaxRequestJournalEntries(100);
+    p.setGzipDisabled(true);
+    p.setDisableOptimizeXmlFactories(true);
+    p.setStubCorsEnabled(true);
+    p.setStubRequestLoggingDisabled(true);
+    p.setMaxTemplateCacheEntries(500L);
+    p.setGlobalTemplating(true);
+    p.setTemplatingEnabled(true);
+    p.setMappingsClassPath("mocks");
+    p.setProxyPassThrough(true);
+    p.setMockResponseHeader("X-MOCK");
+    p.setMockResponseHeaderValue("yes");
+    return p;
+  }
+
+  @Test
+  void equalsAndHashCodeWithAllFieldsPopulated() {
+    WireMockProperties a = fullyPopulated();
+    WireMockProperties b = fullyPopulated();
+
+    // Two fully-populated identical objects: exercises all non-null equal branches
+    assertEquals(a, b);
+    assertEquals(a.hashCode(), b.hashCode());
+
+    // Change each field one at a time to cover the not-equal branch per field
+    b.setContainerThreads(99);
+    assertNotEquals(a, b);
+    b.setContainerThreads(2);
+
+    b.setAsynchronousResponseEnabled(false);
+    assertNotEquals(a, b);
+    b.setAsynchronousResponseEnabled(true);
+
+    b.setAsynchronousResponseThreads(99);
+    assertNotEquals(a, b);
+    b.setAsynchronousResponseThreads(4);
+
+    b.setRootDirectory("/other");
+    assertNotEquals(a, b);
+    b.setRootDirectory("/tmp/stubs");
+
+    b.setJournalDisabled(false);
+    assertNotEquals(a, b);
+    b.setJournalDisabled(true);
+
+    b.setMaxRequestJournalEntries(99);
+    assertNotEquals(a, b);
+    b.setMaxRequestJournalEntries(100);
+
+    b.setGzipDisabled(false);
+    assertNotEquals(a, b);
+    b.setGzipDisabled(true);
+
+    b.setDisableOptimizeXmlFactories(false);
+    assertNotEquals(a, b);
+    b.setDisableOptimizeXmlFactories(true);
+
+    b.setStubCorsEnabled(false);
+    assertNotEquals(a, b);
+    b.setStubCorsEnabled(true);
+
+    b.setStubRequestLoggingDisabled(false);
+    assertNotEquals(a, b);
+    b.setStubRequestLoggingDisabled(true);
+
+    b.setMaxTemplateCacheEntries(999L);
+    assertNotEquals(a, b);
+    b.setMaxTemplateCacheEntries(500L);
+
+    b.setGlobalTemplating(false);
+    assertNotEquals(a, b);
+    b.setGlobalTemplating(true);
+
+    b.setMappingsClassPath("other");
+    assertNotEquals(a, b);
+    b.setMappingsClassPath("mocks");
+
+    b.setMockResponseHeader("other");
+    assertNotEquals(a, b);
+    b.setMockResponseHeader("X-MOCK");
+
+    b.setMockResponseHeaderValue("other");
+    assertNotEquals(a, b);
+    b.setMockResponseHeaderValue("yes");
+
+    b.setEnabled(false);
+    assertNotEquals(a, b);
+    b.setEnabled(true);
+
+    b.setTemplatingEnabled(false);
+    assertNotEquals(a, b);
+    b.setTemplatingEnabled(true);
+
+    b.setProxyPassThrough(false);
+    assertNotEquals(a, b);
+    b.setProxyPassThrough(true);
+
+    // null on this-side vs non-null on other-side (covers the ternary's null arm)
+    WireMockProperties withNullContainer = fullyPopulated();
+    withNullContainer.setContainerThreads(null);
+    assertNotEquals(withNullContainer, a); // this.containerThreads=null, other!=null
+    assertNotEquals(a, withNullContainer); // this.containerThreads!=null, other=null
+  }
+
   @Test
   void equalsHashCodeVariants() {
     WireMockProperties a = new WireMockProperties();

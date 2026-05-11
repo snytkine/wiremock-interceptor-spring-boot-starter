@@ -28,7 +28,7 @@
 	<groupId>io.github.snytkine</groupId>
 	<artifactId>wiremock-interceptor-spring-boot-starter</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<!-- Fix #6: align <name> with <artifactId> -->
 	<name>wiremock-interceptor-spring-boot-starter</name>
 	<description>Spring Boot Starter for WireMock RestClient Interceptor</description>
@@ -52,7 +52,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/snytkine/rest-client-wiremock-middleware.git</connection>
 		<developerConnection>scm:git:https://github.com/snytkine/rest-client-wiremock-middleware.git</developerConnection>
-		<tag>wiremock-interceptor-spring-boot-starter-0.0.4</tag>
+		<tag>HEAD</tag>
 		<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
 	</scm>
 	<issueManagement>

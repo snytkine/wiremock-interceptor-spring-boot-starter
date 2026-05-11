@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor;
+package io.github.snytkine.springboot.wm_interceptor;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import net.snytkine.springboot.wm_interceptor.model.WireMockProperties;
+import io.github.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import org.junit.jupiter.api.Test;
 
 class WMInterceptorFactoryTest {

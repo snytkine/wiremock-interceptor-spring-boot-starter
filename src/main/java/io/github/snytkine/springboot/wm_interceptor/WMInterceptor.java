@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor;
+package io.github.snytkine.springboot.wm_interceptor;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -27,6 +27,7 @@ import com.github.tomakehurst.wiremock.http.HttpHeaders;
 import com.github.tomakehurst.wiremock.http.QueryParameter;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
+import io.github.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +42,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import net.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;

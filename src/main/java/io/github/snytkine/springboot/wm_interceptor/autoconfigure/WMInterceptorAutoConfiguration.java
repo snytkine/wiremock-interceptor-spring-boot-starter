@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor.autoconfigure;
+package io.github.snytkine.springboot.wm_interceptor.autoconfigure;
 
-import net.snytkine.springboot.wm_interceptor.WMInterceptorFactory;
-import net.snytkine.springboot.wm_interceptor.WireMockConfigurationFactory;
-import net.snytkine.springboot.wm_interceptor.model.WireMockProperties;
+import io.github.snytkine.springboot.wm_interceptor.WMInterceptorFactory;
+import io.github.snytkine.springboot.wm_interceptor.WireMockConfigurationFactory;
+import io.github.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,13 +31,13 @@ import org.springframework.context.annotation.Import;
  * simply imports the two factory classes that create the necessary beans.
  *
  * <p>The entire configuration is conditional: all beans are created only when the property {@code
- * net.snytkine.rest-client-wiremock-interceptor.enabled=true} is present. If the property is absent
- * or false, no beans are registered and the application is unaffected.
+ * io.github.snytkine.rest-client-wiremock-interceptor.enabled=true} is present. If the property is
+ * absent or false, no beans are registered and the application is unaffected.
  */
 @AutoConfiguration
 @EnableConfigurationProperties(WireMockProperties.class)
 @ConditionalOnProperty(
-    prefix = "net.snytkine.rest-client-wiremock-interceptor",
+    prefix = "io.github.snytkine.rest-client-wiremock-interceptor",
     name = "enabled",
     havingValue = "true")
 @Import({WireMockConfigurationFactory.class, WMInterceptorFactory.class})

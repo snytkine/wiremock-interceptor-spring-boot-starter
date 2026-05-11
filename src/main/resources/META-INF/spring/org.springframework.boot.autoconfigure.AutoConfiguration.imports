@@ -1,1 +1,1 @@
-net.snytkine.springboot.wiremock_middleware.autoconfigure.WMInterceptorAutoConfiguration
+io.github.snytkine.springboot.wm_interceptor.autoconfigure.WMInterceptorAutoConfiguration

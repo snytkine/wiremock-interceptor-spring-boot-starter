@@ -26,8 +26,8 @@ Add this dependency to your `pom.xml`:
 as at this time it will not work with higher version of wiremock.
 ```xml
 <dependency>
-    <groupId>net.snytkine.springboot</groupId>
-    <artifactId>wiremock-middleware</artifactId>
+    <groupId>io.github.snytkine</groupId>
+    <artifactId>wiremock-interceptor-spring-boot-starter</artifactId>
     <version>0.0.1</version>
 </dependency>
 <dependency>
@@ -46,15 +46,16 @@ For documentation of available Faker options look here:
 Enable the middleware in your `application.properties` or `application.yml`:
 ```yaml
 # application.yml
-net:
-  snytkine:
-    rest-client-wiremock-interceptor:
-      enabled: true
-      mock-response-header: X-Mock-Response
-      mock-response-header-value: wiremock-middleware
-      templating-enabled: true
-      mappings-class-path: mocks
-      stub-request-logging-disabled: true
+io:
+  github:
+    snytkine:
+      rest-client-wiremock-interceptor:
+        enabled: true
+        mock-response-header: X-Mock-Response
+        mock-response-header-value: wiremock-middleware
+        templating-enabled: true
+        mappings-class-path: mocks
+        stub-request-logging-disabled: true
 ```
 
 ### Explanation of important configuration properties

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor;
+package io.github.snytkine.springboot.wm_interceptor;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import io.github.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import net.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor;
+package io.github.snytkine.springboot.wm_interceptor;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import net.snytkine.springboot.wm_interceptor.model.WireMockProperties;
+import io.github.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -25,8 +25,8 @@ import org.springframework.core.annotation.Order;
  * Spring {@code @Configuration} class that creates the {@link WMInterceptor} bean.
  *
  * <p>This factory is imported by {@link
- * net.snytkine.springboot.wm_interceptor.autoconfigure.WMInterceptorAutoConfiguration} and only
- * runs when the starter is enabled. You do not need to reference this class directly.
+ * io.github.snytkine.springboot.wm_interceptor.autoconfigure.WMInterceptorAutoConfiguration} and
+ * only runs when the starter is enabled. You do not need to reference this class directly.
  */
 @Configuration
 public class WMInterceptorFactory {

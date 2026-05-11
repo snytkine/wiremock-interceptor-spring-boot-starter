@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor.model;
+package io.github.snytkine.springboot.wm_interceptor.model;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,21 +23,22 @@ import org.springframework.stereotype.Component;
  * Configuration properties for the WireMock RestClient interceptor.
  *
  * <p>All properties are read from {@code application.yml} (or {@code application.properties}) under
- * the prefix {@code net.snytkine.rest-client-wiremock-interceptor}. For example:
+ * the prefix {@code io.github.snytkine.rest-client-wiremock-interceptor}. For example:
  *
  * <pre>{@code
- * net:
- *   snytkine:
- *     rest-client-wiremock-interceptor:
- *       enabled: true
- *       mappings-class-path: mocks
- *       templating-enabled: true
+ * io:
+ *   github:
+ *     snytkine:
+ *       rest-client-wiremock-interceptor:
+ *         enabled: true
+ *         mappings-class-path: mocks
+ *         templating-enabled: true
  * }</pre>
  *
  * <p>Lombok's {@code @Data} generates getters, setters, {@code equals}, {@code hashCode}, and
  * {@code toString} automatically, so you will not find those methods in this source file.
  */
-@ConfigurationProperties(prefix = "net.snytkine.rest-client-wiremock-interceptor")
+@ConfigurationProperties(prefix = "io.github.snytkine.rest-client-wiremock-interceptor")
 @Component
 @Data
 public class WireMockProperties {

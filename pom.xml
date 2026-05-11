@@ -30,8 +30,9 @@
 	<groupId>io.github.snytkine</groupId>
 	<artifactId>wiremock-interceptor-spring-boot-starter</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>wiremock-rest-client-interceptor-spring-boot-starter</name>
+	<version>0.0.4-SNAPSHOT</version>
+	<!-- Fix #6: align <name> with <artifactId> -->
+	<name>wiremock-interceptor-spring-boot-starter</name>
 	<description>Spring Boot Starter for WireMock RestClient Interceptor</description>
 	<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
 	<inceptionYear>2025</inceptionYear>
@@ -98,10 +99,12 @@
 			<version>0.2.0</version>
 		</dependency>
 
+		<!-- Fix #1: mark optional so Lombok does not leak to consumers at runtime -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -115,11 +118,10 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Mockito for mocking in unit tests -->
+		<!-- Fix #3: removed explicit version; Spring Boot BOM manages mockito -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.5.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -178,10 +180,11 @@
 							<artifactId>lombok</artifactId>
 							<version>${lombok.version}</version>
 						</path>
+						<!-- Fix #5: use ${project.parent.version} instead of hardcoded 3.3.1 -->
 						<path>
 							<groupId>org.springframework.boot</groupId>
 							<artifactId>spring-boot-configuration-processor</artifactId>
-							<version>3.3.1</version>
+							<version>${project.parent.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -239,7 +242,7 @@
 			<plugin>
 				<groupId>com.rudikershaw.gitbuildhook</groupId>
 				<artifactId>git-build-hook-maven-plugin</artifactId>
-				<version>3.6.0</version> <!-- Use the latest version -->
+				<version>3.6.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -250,35 +253,29 @@
 				</executions>
 				<configuration>
 					<gitConfig>
-						<!--
-                      The location of the directory containing your hook scripts
-                      relative to the project root.
-                    -->
 						<core.hooksPath>src/main/resources/hooks/</core.hooksPath>
 					</gitConfig>
 					<hooks>
 						<hook>
 							<name>pre-commit</name>
-							<!--
-                          Point to the script file you created.
-                          The plugin copies this into .git/hooks.
-                        -->
 							<script>src/main/resources/hooks/pre-commit</script>
 						</hook>
 					</hooks>
 				</configuration>
 			</plugin>
 
-			<!-- Git Commit ID Plugin to generate git.properties file -->
+			<!-- Fix #4: switched from deprecated pl.project13.maven:git-commit-id-plugin
+			     to the maintained io.github.git-commit-id:git-commit-id-maven-plugin,
+			     which is also managed by Spring Boot's parent POM -->
 			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<version>4.9.10</version>
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
 				<configuration>
 					<generateGitPropertiesFile>true</generateGitPropertiesFile>
 					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.sonatype.central</groupId>
 				<artifactId>central-publishing-maven-plugin</artifactId>
@@ -289,50 +286,6 @@
 					<autoPublish>true</autoPublish>
 					<waitUntil>published</waitUntil>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.3.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<doclint>none</doclint>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 			<plugin>
@@ -358,8 +311,59 @@
 	</build>
 
 	<profiles>
+		<!-- Fix #2: GPG signing, sources JAR, and javadoc JAR are only needed when
+		     publishing to Maven Central. Keeping them here prevents every `mvn verify`
+		     from requiring a GPG key. Activated automatically by maven-release-plugin
+		     via releaseProfiles=release, or manually with -Prelease. -->
 		<profile>
 			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.3.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<doclint>none</doclint>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 </project>

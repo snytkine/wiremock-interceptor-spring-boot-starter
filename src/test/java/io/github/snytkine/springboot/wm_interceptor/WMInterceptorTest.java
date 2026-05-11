@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.snytkine.springboot.wm_interceptor;
+package io.github.snytkine.springboot.wm_interceptor;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,11 +22,11 @@ import com.github.tomakehurst.wiremock.direct.DirectCallHttpServer;
 import com.github.tomakehurst.wiremock.http.HttpHeader;
 import com.github.tomakehurst.wiremock.http.HttpHeaders;
 import com.github.tomakehurst.wiremock.http.Response;
+import io.github.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import net.snytkine.springboot.wm_interceptor.model.WireMockProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
@@ -118,7 +118,7 @@ class WMInterceptorTest {
 
     Class<?> adapterCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
     java.lang.reflect.Constructor<?> ctor =
         adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
     ctor.setAccessible(true);
@@ -151,7 +151,7 @@ class WMInterceptorTest {
 
     Class<?> respCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$WiremockClientHttpResponse");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$WiremockClientHttpResponse");
     java.lang.reflect.Constructor<?> ctor = respCls.getDeclaredConstructor(Response.class);
     ctor.setAccessible(true);
     org.springframework.http.client.ClientHttpResponse resp =
@@ -186,7 +186,7 @@ class WMInterceptorTest {
 
     Class<?> adapterCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
     java.lang.reflect.Constructor<?> ctor =
         adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
     ctor.setAccessible(true);
@@ -251,7 +251,7 @@ class WMInterceptorTest {
 
     Class<?> adapterCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
     java.lang.reflect.Constructor<?> ctor =
         adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
     ctor.setAccessible(true);
@@ -299,7 +299,7 @@ class WMInterceptorTest {
 
     Class<?> adapterCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
     java.lang.reflect.Constructor<?> ctor =
         adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
     ctor.setAccessible(true);
@@ -334,7 +334,7 @@ class WMInterceptorTest {
 
     Class<?> adapterCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
     java.lang.reflect.Constructor<?> ctor =
         adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
     ctor.setAccessible(true);
@@ -391,7 +391,7 @@ class WMInterceptorTest {
 
     Class<?> adapterCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$SpringHttpRequestAdapter");
     java.lang.reflect.Constructor<?> ctor =
         adapterCls.getDeclaredConstructor(HttpRequest.class, byte[].class);
     ctor.setAccessible(true);
@@ -410,7 +410,7 @@ class WMInterceptorTest {
 
     Class<?> respCls =
         Class.forName(
-            "net.snytkine.springboot.wm_interceptor.WMInterceptor$WiremockClientHttpResponse");
+            "io.github.snytkine.springboot.wm_interceptor.WMInterceptor$WiremockClientHttpResponse");
     java.lang.reflect.Constructor<?> ctor = respCls.getDeclaredConstructor(Response.class);
     ctor.setAccessible(true);
     org.springframework.http.client.ClientHttpResponse resp =

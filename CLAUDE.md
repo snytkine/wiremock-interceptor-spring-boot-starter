@@ -37,7 +37,7 @@ This is a **Spring Boot auto-configuration starter** (library, not an applicatio
 The entire starter is gated by a single property:
 
 ```yaml
-net.snytkine.rest-client-wiremock-interceptor:
+io.github.snytkine.rest-client-wiremock-interceptor:
   enabled: true
 ```
 
@@ -82,7 +82,7 @@ Notable adapter details:
 
 ### Configuration properties
 
-All properties live under the prefix `net.snytkine.rest-client-wiremock-interceptor` (class `WireMockProperties`). Noteworthy ones:
+All properties live under the prefix `io.github.snytkine.rest-client-wiremock-interceptor` (class `WireMockProperties`). Noteworthy ones:
 
 | Property | Default | Purpose |
 |---|---|---|

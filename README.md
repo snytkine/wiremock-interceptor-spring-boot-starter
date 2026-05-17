@@ -28,7 +28,7 @@ as at this time it will not work with higher version of wiremock.
 <dependency>
     <groupId>io.github.snytkine</groupId>
     <artifactId>wiremock-interceptor-spring-boot-starter</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.4</version>
 </dependency>
 <dependency>
     <groupId>org.wiremock</groupId>
@@ -283,3 +283,21 @@ The middleware uses Spring Boot's configuration properties pattern to allow cust
 
 ### Direct Call HTTP Server
 Uses WireMock's `DirectCallHttpServer` which allows in-process request matching without network overhead, making tests fast and reliable.
+
+## Community & Support
+
+Have a question, idea, or want to share how you're using this starter? Join the conversation in [GitHub Discussions](https://github.com/snytkine/wiremock-interceptor-spring-boot-starter/discussions).
+
+For bugs and feature requests, please open an [issue](https://github.com/snytkine/wiremock-interceptor-spring-boot-starter/issues).
+
+## License
+
+Copyright 2025 - 2026 Dmitri Snytkine. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+The full license text is available in the [LICENSE.txt](LICENSE.txt) file.

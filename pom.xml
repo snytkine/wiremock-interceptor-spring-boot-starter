@@ -32,7 +32,7 @@
 	<!-- Fix #6: align <name> with <artifactId> -->
 	<name>wiremock-interceptor-spring-boot-starter</name>
 	<description>Spring Boot Starter for WireMock RestClient Interceptor</description>
-	<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
+	<url>https://github.com/snytkine/wiremock-interceptor-spring-boot-starter</url>
 	<inceptionYear>2025</inceptionYear>
 	<developers>
 		<developer>
@@ -50,14 +50,14 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:https://github.com/snytkine/rest-client-wiremock-middleware.git</connection>
-		<developerConnection>scm:git:https://github.com/snytkine/rest-client-wiremock-middleware.git</developerConnection>
+		<connection>scm:git:https://github.com/snytkine/wiremock-interceptor-spring-boot-starter.git</connection>
+		<developerConnection>scm:git:https://github.com/snytkine/wiremock-interceptor-spring-boot-starter.git</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/snytkine/rest-client-wiremock-middleware</url>
+		<url>https://github.com/snytkine/wiremock-interceptor-spring-boot-starter</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/snytkine/rest-client-wiremock-middleware/issues</url>
+		<url>https://github.com/snytkine/wiremock-interceptor-spring-boot-starter/issues</url>
 	</issueManagement>
 	<properties>
 		<java.version>21</java.version>
